@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Fragmentation in Networks</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #000; /* Black background */
+        color: #f5f5f5; /* Light grey text for contrast */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .container {
+        padding: 20px;
+        width: 80%;
+        max-width: 600px;
+        text-align: center; /* Center align text */
+        border-radius: 10px;
+        background-color: #1c1c1c; /* Slightly lighter black for contrast */
+        box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+    }
+
+    h1, h2 {
+        color: rgba(33, 172, 211, 0.7); /* Bright green for headings */
+        text-shadow: 2px 2px 10px rgba(33, 172, 211, 0.7);
+    }
+
+    .section {
+        margin-bottom: 20px;
+        text-align: left; /* Align section content to the left */
+    }
+
+    .input-row {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: flex-start; /* Align items to the start of the container */
+}
+
+.input-row label {
+    margin-bottom: 5px;
+    color: rgba(33, 172, 211, 0.7); /* Bright green for labels */
+}
+
+.input-row input, 
+.input-row select {
+    padding: 10px;
+    margin-right: 10px;
+    width: auto;
+    border: 2px solid rgba(33, 172, 211, 0.7); /* Green border */
+    border-radius: 5px;
+    background-color: white; /* White background for input fields */
+    color: #000; /* Black text in input fields */
+    font-size: 14px;
+}
+.input-row .input-group {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.input-row .input-group label {
+    margin-bottom: 0;
+}
+
+.input-row .input-group input, 
+.input-row .input-group select {
+    width: 48%; /* Adjust width of input/select elements to be beside each other */
+}
+
+.input-row .input-group select {
+    margin-left: 10px; /* Add some spacing between the input and select elements */
+}
+
+    .input-row input:focus, 
+    .input-row select:focus {
+        outline: none;
+        border-color: rgba(33, 172, 211, 0.7); /* Bright green on focus */
+    }
+
+    .navigation {
+        margin-top: 20px;
+    }
+
+    .navigation button {
+        padding: 10px 20px;
+        background-color: #3498db; /* Blue button */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .navigation button:hover {
+        background-color: #1e90ff; /* Lighter blue on hover */
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    ul li {
+        margin-bottom: 5px;
+        background-color: #333; /* Dark grey for list items */
+        padding: 10px;
+        border-radius: 5px;
+        color: #f5f5f5;
+    }
+
+    ul li:nth-child(odd) {
+        background-color: #444; /* Slightly different grey for alternate items */
+    }
+</style>
+
+
+</head>
+<body>
+    <!-- Router Details Page -->
+    <div id="routerPage" class="container">
+        <h1>Router Details</h1>
+        <div id="router-section" class="section">
+            <h2>Enter Routers</h2>
+            <label for="routerCount">Number of routers: </label>
+            <input type="number" id="routerCount" min="1">
+            <button onclick="generateRouterInputs()">Generate Inputs</button>
+            <div id="routerInputs"></div>
+        </div>
+        <div class="navigation">
+            <button onclick="goToDataPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Data Input Page -->
+    <div id="dataPage" class="container hidden">
+        <h1>Data Inputs</h1>
+        <div id="data-section" class="section">
+            <h2>Enter Data</h2>
+            <label for="dataCount">Number of data items: </label>
+            <input type="number" id="dataCount" min="1">
+            <button onclick="generateDataInputs()">Generate Inputs</button>
+            <div id="dataInputs"></div>
+        </div>
+        <div class="navigation">
+            <button onclick="goToFragmentPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Fragmentation Results Page -->
+    <div id="fragmentPage" class="container hidden">
+        <h1>Fragmentation Results</h1>
+        <div id="fragment-section" class="section">
+            <h2>Results</h2>
+            <button onclick="performFragmentation()">Show Fragmentation</button>
+            <div id="fragmentOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        let routerDetails = [];
+
+        // Function to generate router inputs
+        function generateRouterInputs() {
+            const routerCount = parseInt(document.getElementById("routerCount").value);
+            const routerInputs = document.getElementById("routerInputs");
+            routerInputs.innerHTML = "";
+
+            if (!routerCount || routerCount < 1) {
+                alert("Please enter a valid number of routers.");
+                return;
+            }
+
+            routerDetails = []; // Reset router details
+            for (let i = 0; i < routerCount; i++) {
+                const div = document.createElement("div");
+                div.className = "input-row";
+                div.innerHTML = `
+                    <label>Router ${i + 1} MTU: </label>
+                    <input type="number" id="mtu${i}" placeholder="Enter MTU" required>
+                    <select id="mtuUnit${i}">
+                        <option value="1">Bits</option>
+                        <option value="1024">KB</option>
+                        <option value="1048576">MB</option>
+                        <option value="1073741824">GB</option>
+                    </select>
+                `;
+                routerInputs.appendChild(div);
+            }
+        }
+
+        // Function to navigate to the Data Input Page
+        function goToDataPage() {
+            const routerCount = parseInt(document.getElementById("routerCount").value);
+            if (!routerCount || routerCount < 1) {
+                alert("Please enter a valid number of routers.");
+                return;
+            }
+
+            routerDetails = [];
+            for (let i = 0; i < routerCount; i++) {
+                const mtu = parseFloat(document.getElementById(`mtu${i}`).value);
+                const mtuUnit = parseFloat(document.getElementById(`mtuUnit${i}`).value);
+                if (!mtu || mtu <= 0) {
+                    alert(`Please enter a valid MTU for Router ${i + 1}.`);
+                    return;
+                }
+                routerDetails.push({
+                    mtu: mtu * mtuUnit,
+                    name: `Router ${i + 1}`
+                });
+            }
+
+            document.getElementById("routerPage").classList.add("hidden");
+            document.getElementById("dataPage").classList.remove("hidden");
+        }
+
+        // Function to generate data inputs
+        function generateDataInputs() {
+            const dataCount = parseInt(document.getElementById("dataCount").value);
+            const dataInputs = document.getElementById("dataInputs");
+            dataInputs.innerHTML = "";
+
+            if (!dataCount || dataCount < 1) {
+                alert("Please enter a valid number of data items.");
+                return;
+            }
+
+            for (let i = 0; i < dataCount; i++) {
+                const div = document.createElement("div");
+                div.className = "input-row";
+                div.innerHTML = `
+                    <label>Data ${i + 1}: </label>
+                    <input type="number" id="dataSize${i}" placeholder="Enter size" required>
+                    <select id="dataUnit${i}">
+                        <option value="1">Bits</option>
+                        <option value="1024">KB</option>
+                        <option value="1048576">MB</option>
+                        <option value="1073741824">GB</option>
+                    </select>
+                    Identification Number: <input type="text" id="dataID${i}" placeholder="Enter ID" required>
+                    Router:
+                    <select id="routerSelect${i}">
+                        ${routerDetails
+                            .map(
+                                (router, index) =>
+                                    `<option value="${index}">${router.name}</option>`
+                            )
+                            .join("")}
+                    </select>
+                `;
+                dataInputs.appendChild(div);
+            }
+        }
+
+        // Function to navigate to the Fragmentation Results Page
+        function goToFragmentPage() {
+            const dataCount = parseInt(document.getElementById("dataCount").value);
+            if (!dataCount || dataCount < 1) {
+                alert("Please enter a valid number of data items.");
+                return;
+            }
+            document.getElementById("dataPage").classList.add("hidden");
+            document.getElementById("fragmentPage").classList.remove("hidden");
+        }
+
+
+        // Function to perform fragmentation
+function performFragmentation() {
+    const fragmentOutput = document.getElementById("fragmentOutput");
+    fragmentOutput.innerHTML = "<h3>Fragmentation Results</h3>";
+
+    const dataCount = parseInt(document.getElementById("dataCount").value) || 0;
+
+    for (let i = 0; i < dataCount; i++) {
+        const dataSize =
+            parseFloat(document.getElementById(`dataSize${i}`).value) *
+            parseFloat(document.getElementById(`dataUnit${i}`).value);
+        const unitMultiplier = parseFloat(document.getElementById(`dataUnit${i}`).value); // User-selected unit
+        const routerIndex = document.getElementById(`routerSelect${i}`).value;
+        const id = document.getElementById(`dataID${i}`).value;
+
+        if (!routerIndex || !dataSize || !id) {
+            fragmentOutput.innerHTML += `<p>Data ${i + 1}: Missing or invalid input.</p>`;
+            continue;
+        }
+
+        const mtu = routerDetails[routerIndex].mtu;
+        let offset = 0;
+        let fragments = 0;
+        let result = `<p>Data ${i + 1} (ID: ${id}):</p><ul>`;
+
+        while (offset < dataSize) {
+            const fragmentSize = Math.min(mtu, dataSize - offset);
+            const mf = offset + fragmentSize < dataSize ? 1 : 0; // More Fragments flag
+
+            // Convert fragment size and offset to the user-selected unit
+            const fragmentSizeInUnit = fragmentSize / unitMultiplier;
+            const offsetInUnit = offset / unitMultiplier;
+
+            result += `<li>Fragment ${++fragments}: Size = ${fragmentSizeInUnit.toFixed(2)}, Offset = ${offsetInUnit.toFixed(2)}, MF = ${mf}</li>`;
+            offset += fragmentSize;
+        }
+
+        result += `</ul>`;
+        fragmentOutput.innerHTML += result;
+    }
+}
+</script>
+</body>
+</html>
